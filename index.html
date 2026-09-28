@@ -185,7 +185,7 @@ header{flex-shrink:0;z-index:5;background:var(--paper);border-bottom:1px solid v
   const $ = (s, r = document) => r.querySelector(s);
   // The Render backend this static frontend talks to. Update if the service name
   // or region changes — must match the Render service's actual assigned URL.
-  const API_BASE = "https://tripagent-chat.onrender.com";
+  const API_BASE = "https://tripagent-chatbot.onrender.com";
   const KEY = "tripagent:chat:session";
   let session = null;
   try { session = JSON.parse(localStorage.getItem(KEY) || "null"); } catch {}
