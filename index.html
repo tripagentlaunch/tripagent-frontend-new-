@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TripAgent</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 420'%3E%3Crect width='420' height='420' fill='%23111'/%3E%3Cg stroke='%23fff' stroke-width='26' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M140,150 L280,150'/%3E%3Cpath d='M210,150 L210,212'/%3E%3Cpath d='M140,300 L210,212 L280,300'/%3E%3Cpath d='M174,256 L246,256'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* The app's own register: paper and ink, one wine accent, hairlines, square corners. */
+:root{--ink:#111;--muted:#4A4744;--faint:#8A8580;--paper:#fff;--alt:#FAF8F5;--rule:#E3E0DC;--accent:#6E1E32;--wash:#F6EEF0;--rose:#E3B9C4;--serif:"Cormorant Garamond",Georgia,serif;--sans:"Jost",system-ui,sans-serif}
+*{box-sizing:border-box;border-radius:0;margin:0}
+html,body{height:100%}
+body{background:var(--alt);color:var(--ink);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:var(--accent)}
+.app{max-width:560px;margin:0 auto;height:100vh;height:100dvh;background:var(--paper);border-left:1px solid var(--rule);border-right:1px solid var(--rule);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.eyebrow{font:500 10px/1.2 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 20px;font:500 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--ink)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-line{background:var(--paper);color:var(--ink)}
+.btn-sm{height:38px;padding:0 14px;font-size:11px}
+.btn:disabled{opacity:.45;cursor:default}
+.hidden{display:none!important}
+
+/* door */
+.door{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}
+.door-hero{position:relative;min-height:50vh;min-height:50dvh;flex-shrink:0;background:#111 center/cover no-repeat;display:flex;align-items:flex-end;padding:28px 22px}
+.door-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.3),rgba(10,10,10,0) 30%,rgba(10,10,10,.75))}
+.door-hero>*{position:relative;z-index:1}
+.door h1{font:400 42px/1.08 var(--serif);color:#fff;margin-top:14px}
+.door h1 em{color:var(--rose)}
+.door-body{padding:32px 22px 40px}
+.code{width:100%;height:60px;border:1px solid var(--rule);text-align:center;font:400 26px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase;margin-top:14px}
+.code:focus{outline:none;border-color:var(--ink)}
+.err{color:var(--accent);font-size:13px;line-height:1.5;margin-top:12px;min-height:20px}
+.small{font-size:13px;color:var(--faint);line-height:1.6}
+
+/* header */
+header{flex-shrink:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
+.mark{font:400 24px/1 var(--serif)}
+.hbtn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--rule);font:500 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.count{background:var(--accent);color:#fff;min-width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:0;padding:0 4px}
+
+/* thread */
+.thread{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:22px 18px 24px}
+.hello h2{font:400 34px/1.15 var(--serif);margin-top:12px}
+.hello p{color:var(--muted);font-weight:300;margin-top:10px}
+.chips{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+.chip{border:1px solid var(--rule);text-align:left;padding:13px 14px;font-size:15px;color:var(--ink);background:var(--paper);transition:border-color .2s}
+.chip:hover{border-color:var(--ink)}
+.msg{margin:0 0 18px;animation:rise .35s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.me{display:flex;justify-content:flex-end}
+.me .b{background:var(--ink);color:#fff;padding:11px 15px;max-width:85%;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
+.ai .b{color:var(--ink);font-size:15.5px;max-width:100%;overflow-wrap:anywhere}
+.ai .b p+p,.ai .b ul+p,.ai .b p+ul{margin-top:10px}
+.ai .b ul{padding-left:18px}
+.ai .b li{margin:3px 0}
+.ai .b strong{font-weight:500}
+.who{font:500 10px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.fb{display:flex;gap:14px;margin-top:8px;align-items:center}
+.fb button{font-size:12px;color:var(--faint);text-decoration:underline;text-underline-offset:3px}
+.fb .done{font-size:12px;color:var(--accent)}
+.fb input{flex:1;border:0;border-bottom:1px solid var(--rule);font-size:13px;padding:4px 0}
+.fb input:focus{outline:none;border-color:var(--ink)}
+.failed .b{color:var(--accent)}
+.card{border:1px solid var(--rule);display:flex;align-items:stretch;margin:4px 0 18px;animation:rise .35s both}
+.card .thumb{width:96px;flex-shrink:0;background:#111 center/cover}
+.card .body{flex:1;padding:14px 14px 14px 16px;min-width:0}
+.card .t{font:400 21px/1.2 var(--serif);margin-top:6px}
+.card .row{display:flex;gap:8px;margin-top:12px}
+.activity{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;margin:0 0 18px}
+.dots{display:inline-flex;gap:4px}.dots i{width:5px;height:5px;background:var(--accent);animation:blink 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* composer */
+.composer{flex-shrink:0;background:var(--paper);border-top:1px solid var(--rule);padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+.compose{display:flex;gap:8px;align-items:flex-end}
+.compose textarea{flex:1;resize:none;border:1px solid var(--rule);padding:12px 14px;font-size:16px;line-height:1.45;max-height:160px;min-height:48px}
+.compose textarea:focus{outline:none;border-color:var(--ink)}
+.send{width:48px;height:48px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send:disabled{opacity:.35}
+.note{font-size:11.5px;color:var(--faint);margin-top:8px;text-align:center}
+
+/* sheets */
+.sheet{position:fixed;inset:0;z-index:20;display:flex;justify-content:center;background:rgba(17,17,17,.4);animation:fade .25s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.panel{width:100%;max-width:560px;background:var(--paper);display:flex;flex-direction:column;height:100vh;height:100dvh;animation:up .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.bar{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rule);padding:10px 14px;flex-shrink:0}
+.bar .title{flex:1;min-width:0;font:400 20px/1.2 var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{font:500 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;height:36px}
+.frame{flex:1;border:0;width:100%;background:var(--alt)}
+.foot{border-top:1px solid var(--rule);padding:12px 14px calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.foot .msgline{flex-basis:100%;font-size:13px;color:var(--accent)}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:22px 18px 40px}
+.sec{margin-bottom:30px}
+.sec h3{font:400 26px/1.2 var(--serif);margin:8px 0 12px}
+.list{border-top:1px solid var(--rule);list-style:none;padding:0}
+.list li{border-bottom:1px solid var(--rule);padding:13px 0}
+.list .l1{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.list .name{font-size:16px}
+.pill{font:500 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;background:var(--alt);color:var(--muted);padding:6px 8px;white-space:nowrap}
+.pill.hot{background:var(--wash);color:var(--accent)}
+.list .l2{font-size:13px;color:var(--faint);margin-top:3px}
+.list .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.quote{background:#111;color:#fff;padding:14px;margin-top:10px}
+.quote b{font:400 28px/1 var(--serif);display:block;margin:6px 0}
+.empty{color:var(--faint);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- The door -->
+  <section class="door" id="door">
+    <div class="door-hero" id="doorHero">
+      <div>
+        <p class="eyebrow" style="color:rgba(255,255,255,.7)">TripAgent · by invitation</p>
+        <h1>Someone who travels <em>with</em> you.</h1>
+      </div>
+    </div>
+    <form class="door-body" id="doorForm" autocomplete="off">
+      <p class="eyebrow">Your access code</p>
+      <p style="color:var(--muted);font-weight:300;margin-top:8px">Eight characters, from your invitation: two letters, four numerals, two letters.</p>
+      <input class="code" id="code" maxlength="10" placeholder="AB1234CD" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Access code">
+      <p class="err" id="doorErr" role="alert"></p>
+      <button class="btn btn-ink" style="width:100%;margin-top:6px" id="doorBtn">Continue</button>
+      <p class="small" style="margin-top:22px">Codes come from your advisor. Lost yours? Write to <a href="mailto:maison@tripsure.com">maison@tripsure.com</a>.</p>
+    </form>
+  </section>
+
+  <!-- The desk -->
+  <section class="hidden" id="desk" style="flex:1;min-height:0;display:flex;flex-direction:column">
+    <header>
+      <span class="mark">TripAgent</span>
+      <span style="display:flex;gap:8px">
+        <button class="hbtn" id="tripsBtn">Trips <span class="count hidden" id="tripCount"></span></button>
+        <button class="hbtn" id="outBtn" title="Sign out">Sign out</button>
+      </span>
+    </header>
+    <div class="thread" id="thread" aria-live="polite"></div>
+    <div class="composer">
+      <form class="compose" id="compose">
+        <textarea id="input" rows="1" maxlength="8000" placeholder="Where, and roughly when?" aria-label="Your message"></textarea>
+        <button class="send" id="sendBtn" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <p class="note" id="note">Replies are the desk's own. Prices come from your advisor, never guessed.</p>
+    </div>
+  </section>
+</div>
+
+<template id="itineraryTpl">
+  <div class="sheet"><div class="panel">
+    <div class="bar"><button class="back" data-close>‹ Chat</button><span class="title" data-title>Your itinerary</span><button class="hbtn" data-share>Share</button></div>
+    <iframe class="frame" data-frame title="Itinerary"></iframe>
+    <div class="foot"><p class="msgline hidden" data-msg></p><button class="btn btn-ink" style="flex:1" data-price>Send for a price</button></div>
+  </div></div>
+</template>
+
+<template id="tripsTpl">
+  <div class="sheet"><div class="panel">
+    <div class="bar"><button class="back" data-close>‹ Chat</button><span class="title">Your trips</span></div>
+    <div class="scroll">
+      <div class="sec"><p class="eyebrow">Coming up · the next 7 days</p><ul class="list" data-due></ul></div>
+      <div class="sec"><p class="eyebrow">With your advisor</p><ul class="list" data-reqs></ul></div>
+      <div class="sec"><p class="eyebrow">Your itineraries</p><ul class="list" data-trips></ul></div>
+      <p class="small">Your advisor replies the same day. All times IST. TripAgent is operated by Tripsure.</p>
+    </div>
+  </div></div>
+</template>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  // The Render backend this static frontend talks to. Update if the service name
+  // or region changes — must match the Render service's actual assigned URL.
+  const API_BASE = "https://tripagent-chat.onrender.com";
+  const KEY = "tripagent:chat:session";
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem(KEY) || "null"); } catch {}
+  if (session && Date.parse(session.expiresAt) < Date.now()) session = null;
+
+  const LABELS = { build_trip_plan: "Building your plan. This can take a minute or two", build_comparison: "Comparing your options", get_plan: "Reading your plan", web_search: "Looking it up", read_page: "Reading a source", search_memory: "Checking what we know", read_memory: "Checking what we know", memory_history: "Checking what we know", where_to_go: "Checking our guides", find_destination: "Checking our guides", get_destination_guide: "Reading our guide" };
+  const HEROES = ["kyoto", "amalfi-coast", "santorini", "udaipur", "zermatt", "male-maldives", "paris", "tokyo"];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const inr = (n) => "₹" + Math.round(n).toLocaleString("en-IN");
+  const when = (iso) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const BARE = /^https?:\/\/\S+\/p\/([a-f0-9]{64})\/?$/;
+
+  /* ------------------------------------------------------------ api --- */
+  async function api(path, opts = {}) {
+    const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}), ...(session ? { Authorization: "Bearer " + session.token } : {}) };
+    const res = await fetch(API_BASE + path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    if (res.status === 401 && session) { signOut(); throw new Error("Your session has ended. Sign in again with your code."); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || "The desk could not take that just now."), { status: res.status });
+    return data;
+  }
+
+  /* ----------------------------------------------------------- door --- */
+  const door = $("#door"), desk = $("#desk"), code = $("#code"), doorErr = $("#doorErr");
+  $("#doorHero").style.backgroundImage = `url(/img/city/${HEROES[Math.floor(Math.random() * HEROES.length)]}-hero.jpg)`;
+  code.addEventListener("input", () => { code.value = code.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8); doorErr.textContent = ""; });
+  $("#doorForm").addEventListener("submit", async (e) => { e.preventDefault(); await signIn(code.value); });
+
+  async function signIn(raw) {
+    const c = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (!/^[A-Z]{2}\d{4}[A-Z]{2}$/.test(c)) { doorErr.textContent = "An access code is two letters, four numerals, then two letters."; return; }
+    $("#doorBtn").disabled = true; $("#doorBtn").textContent = "Checking…";
+    try {
+      const d = await api("/api/session", { method: "POST", body: { code: c } });
+      session = { token: d.token, expiresAt: d.expiresAt, member: d.member };
+      localStorage.setItem(KEY, JSON.stringify(session));
+      history.replaceState(null, "", location.pathname);
+      await openDesk();
+    } catch (err) { doorErr.textContent = err.message; }
+    finally { $("#doorBtn").disabled = false; $("#doorBtn").textContent = "Continue"; }
+  }
+
+  function signOut() {
+    session = null;
+    try { localStorage.removeItem(KEY); } catch {}
+    desk.classList.add("hidden"); door.classList.remove("hidden");
+    $("#thread").replaceChildren();
+  }
+  $("#outBtn").addEventListener("click", () => { if (confirm("Sign out on this device? Your conversation stays with the desk.")) signOut(); });
+
+  /* ----------------------------------------------------------- desk --- */
+  const thread = $("#thread"), input = $("#input"), sendBtn = $("#sendBtn");
+  let busy = false;
+
+  function greeting() {
+    const h = new Date().getHours();
+    const part = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+    const first = (session?.member?.name || "").split(" ")[0];
+    const box = document.createElement("div");
+    box.className = "hello msg";
+    box.innerHTML = `<p class="eyebrow">Your travel desk</p><h2>${esc(part)}${first ? ", " + esc(first) : ""}.</h2>
+      <p>Tell me where, or roughly when. I come back with a plan you can change, and your advisor prices it.</p>
+      <div class="chips">${["Where is good in March, for two of us?", "Plan five unhurried days in Tokyo in November", "Compare Bali and the Maldives for a honeymoon", "What do I need for a Schengen visa?"].map((t) => `<button class="chip" type="button">${esc(t)}</button>`).join("")}</div>`;
+    box.querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => send(b.textContent)));
+    thread.append(box);
+  }
+
+  // The same rule as the itinerary page (src/trip/humanize.ts): em dashes read as
+  // machine copy, so they are shown as commas. What is stored is untouched.
+  const humanize = (t) => String(t)
+    .replace(/\s*—\s*$/gm, "").replace(/^\s*—\s*/gm, "")
+    .replace(/\s+—\s+/g, ", ").replace(/(\w)—(\w)/g, "$1, $2").replace(/\s*—\s*/g, ", ")
+    .replace(/,\s*,/g, ",").replace(/\(\s*,\s*/g, "(");
+
+  function render(md) {
+    // A little markdown: paragraphs, bullets, bold, links. Everything else is text.
+    const blocks = humanize(md).trim().split(/\n{2,}/);
+    return blocks.map((b) => {
+      const lines = b.split("\n");
+      const fmt = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+      if (lines.every((l) => /^\s*[-*•]\s+/.test(l))) return `<ul>${lines.map((l) => `<li>${fmt(l.replace(/^\s*[-*•]\s+/, ""))}</li>`).join("")}</ul>`;
+      return `<p>${lines.map(fmt).join("<br>")}</p>`;
+    }).join("");
+  }
+
+  function addMe(text) {
+    const el = document.createElement("div");
+    el.className = "msg me";
+    el.innerHTML = `<div class="b">${esc(text)}</div>`;
+    thread.append(el); scroll();
+  }
+
+  function addAi(text, { failed = false, feedback = true } = {}) {
+    const el = document.createElement("div");
+    el.className = "msg ai" + (failed ? " failed" : "");
+    el.innerHTML = `<p class="who">TripAgent</p><div class="b">${render(text)}</div>`;
+    if (feedback && !failed) el.append(feedbackRow(text));
+    thread.append(el); scroll();
+    return el;
+  }
+
+  function feedbackRow(reply) {
+    const row = document.createElement("div");
+    row.className = "fb";
+    row.innerHTML = `<button type="button" data-r="up">Helpful</button><button type="button" data-r="down">Not quite</button>`;
+    row.addEventListener("click", async (e) => {
+      const r = e.target.closest("[data-r]")?.dataset.r;
+      if (!r) return;
+      if (r === "down") {
+        row.innerHTML = `<input maxlength="600" placeholder="What was off? (optional)"><button type="button" data-send>Send</button>`;
+        const inp = row.querySelector("input"); inp.focus();
+        const go = async () => { await api("/api/feedback", { method: "POST", body: { rating: "down", reply: reply.slice(0, 4000), note: inp.value.trim() || undefined } }).catch(() => {}); row.innerHTML = `<span class="done">Thank you. It helps the desk learn.</span>`; };
+        row.querySelector("[data-send]").addEventListener("click", go);
+        inp.addEventListener("keydown", (k) => k.key === "Enter" && go());
+        return;
+      }
+      await api("/api/feedback", { method: "POST", body: { rating: "up", reply: reply.slice(0, 4000) } }).catch(() => {});
+      row.innerHTML = `<span class="done">Thank you.</span>`;
+    });
+    return row;
+  }
+
+  function addPlanCard(key) {
+    const el = document.createElement("div");
+    el.className = "card";
+    el.innerHTML = `<div class="thumb"></div><div class="body"><p class="eyebrow" style="color:var(--accent)">Your itinerary</p><p class="t">Opening…</p><div class="row"><button class="btn btn-ink btn-sm" type="button">Open</button></div></div>`;
+    el.querySelector("button").addEventListener("click", () => openItinerary(key));
+    thread.append(el); scroll();
+    api(`/api/plan/${key}`).then((b) => {
+      el.querySelector(".t").textContent = b.plan.title;
+      if (b.plan.kind !== "trip") el.querySelector(".eyebrow").textContent = "Your options, compared";
+      if (b.places?.hero) el.querySelector(".thumb").style.backgroundImage = `url(/img/city/${b.places.hero}-card.jpg)`;
+    }).catch(() => { el.querySelector(".t").textContent = "Your itinerary"; });
+  }
+
+  /** A reply is a list of messages; a bare plan link becomes a card, not a line of text. */
+  function addReply(messages, opts) {
+    const parts = messages.map((m) => m.trim()).filter(Boolean);
+    const linkAt = parts.findIndex((p) => BARE.test(p));
+    if (linkAt < 0) { addAi(parts.join("\n\n"), opts); return; }
+    const intro = parts.slice(0, linkAt).join("\n\n");
+    if (intro) addAi(intro, { ...opts, feedback: false });
+    addPlanCard(parts[linkAt].match(BARE)[1]);
+    const rest = parts.slice(linkAt + 1).join("\n\n");
+    if (rest) addAi(rest, opts);
+  }
+
+  function scroll() { requestAnimationFrame(() => { thread.scrollTop = thread.scrollHeight; }); }
+
+  async function openDesk() {
+    door.classList.add("hidden"); desk.classList.remove("hidden");
+    thread.replaceChildren();
+    try {
+      const { messages } = await api("/api/history");
+      if (!messages.length) greeting();
+      for (const m of messages) {
+        if (m.role === "user") addMe(m.content);
+        else addReply(String(m.content).split(/\n{2,}/), { feedback: false });
+      }
+    } catch { greeting(); }
+    refreshCount();
+    scroll();
+  }
+
+  async function refreshCount() {
+    try {
+      const { requests } = await api("/api/requests");
+      const hot = requests.filter((r) => r.status === "quoted").length;
+      const c = $("#tripCount"); c.textContent = hot; c.classList.toggle("hidden", !hot);
+    } catch {}
+  }
+
+  input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 160) + "px"; });
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(pointer:fine)").matches) { e.preventDefault(); $("#compose").requestSubmit(); } });
+  $("#compose").addEventListener("submit", (e) => { e.preventDefault(); send(input.value); });
+
+  async function send(text) {
+    text = String(text || "").trim();
+    if (!text || busy) return;
+    busy = true; sendBtn.disabled = true;
+    thread.querySelector(".hello")?.remove();
+    addMe(text);
+    input.value = ""; input.style.height = "auto";
+    const act = document.createElement("div");
+    act.className = "activity";
+    act.innerHTML = `<span class="dots"><i></i><i></i><i></i></span><span>Thinking</span>`;
+    thread.append(act); scroll();
+    let live = null, streamed = "";
+    try {
+      const res = await fetch(API_BASE + "/api/chat/stream", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.token }, body: JSON.stringify({ message: text }) });
+      if (res.status === 401) { signOut(); return; }
+      if (!res.ok || !res.body) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "The desk could not answer just now."); }
+      const reader = res.body.getReader(), dec = new TextDecoder();
+      let buf = "", final = null, failure = null;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const frames = buf.split("\n\n"); buf = frames.pop() || "";
+        for (const f of frames) {
+          const line = f.split("\n").find((l) => l.startsWith("data:"));
+          if (!line) continue;
+          let ev; try { ev = JSON.parse(line.slice(5)); } catch { continue; }
+          if (ev.type === "text") {
+            streamed += ev.delta;
+            if (!live) { live = addAi("", { feedback: false }); }
+            live.querySelector(".b").innerHTML = render(streamed);
+            act.querySelector("span:last-child").textContent = "Writing";
+            scroll();
+          } else if (ev.type === "tool") {
+            streamed = ""; live?.remove(); live = null;
+            act.querySelector("span:last-child").textContent = LABELS[ev.name] || "Working";
+          } else if (ev.type === "done") final = ev.messages;
+          else if (ev.type === "error") failure = ev.message;
+        }
+      }
+      live?.remove();
+      if (failure) throw new Error(failure);
+      if (final?.length) addReply(final);
+      refreshCount();
+    } catch (err) {
+      live?.remove();
+      addAi(err.message || "Something went wrong reaching the desk.", { failed: true });
+    } finally {
+      act.remove(); busy = false; sendBtn.disabled = false; input.focus();
+    }
+  }
+
+  /* ------------------------------------------------------ itinerary --- */
+  function mount(tpl) {
+    const node = $(tpl).content.firstElementChild.cloneNode(true);
+    document.body.append(node);
+    const close = () => node.remove();
+    node.querySelector("[data-close]").addEventListener("click", close);
+    document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", k); } });
+    return node;
+  }
+
+  async function openItinerary(key) {
+    const node = mount("#itineraryTpl");
+    const frame = node.querySelector("[data-frame]");
+    frame.src = `${API_BASE}/p/${key}`;
+    const msg = node.querySelector("[data-msg]");
+    const priceBtn = node.querySelector("[data-price]");
+    let plan = null;
+    try {
+      const b = await api(`/api/plan/${key}`);
+      plan = b.plan;
+      node.querySelector("[data-title]").textContent = plan.title;
+      const { requests } = await api("/api/requests");
+      const live = requests.find((r) => r.type === "booking" && r.planId === plan.id && !["closed", "cancelled"].includes(r.status));
+      if (live) { priceBtn.textContent = live.status === "quoted" ? "Your price is ready" : "With your advisor"; priceBtn.onclick = () => { node.remove(); openTrips(); }; }
+      if (plan.kind !== "trip") priceBtn.classList.add("hidden");
+    } catch {}
+    node.querySelector("[data-share]").addEventListener("click", async () => {
+      const url = `${API_BASE}/p/${key}`;
+      try { if (navigator.share) await navigator.share({ title: plan?.title || "Itinerary", url }); else { await navigator.clipboard.writeText(url); msg.textContent = "Link copied."; msg.classList.remove("hidden"); } } catch {}
+    });
+    if (!priceBtn.onclick) priceBtn.addEventListener("click", async () => {
+      if (!plan) return;
+      // The member's swaps live in the page's own storage, on this origin.
+      let choices = {};
+      try { choices = JSON.parse(localStorage.getItem("pv-swaps:/p/" + key) || "{}"); } catch {}
+      const pick = (g, id) => [g.recommended, ...g.alternatives][choices[id] ?? 0] || g.recommended;
+      // Same rule as the app's splitName: the rate is unconfirmed, not the hotel.
+      const clean = (n) => String(n).replace(/\s*\([^)]*(candidate|unverified|not checked|to verify|to confirm)[^)]*\)\s*$/i, "").replace(/\s*[,—-]\s*(unverified|candidate)\b.*$/i, "").trim();
+      const components = [
+        ...(plan.flightOptions || []).map((g, i) => ({ id: `flight-${i}`, kind: "flight", title: clean(pick(g, `flight-${i}`).name).slice(0, 200), detail: String(g.label || "").slice(0, 300) })),
+        ...(plan.hotelOptions || []).map((g, i) => ({ id: `stay-${i}`, kind: "hotel", title: clean(pick(g, `stay-${i}`).name).slice(0, 200), detail: String(g.label || "").slice(0, 300) })),
+      ];
+      priceBtn.disabled = true; priceBtn.textContent = "Sending…";
+      try {
+        const { request } = await api("/api/requests", { method: "POST", body: { type: "booking", planId: plan.id, planKey: key, title: plan.title.slice(0, 200), components, choices: Object.fromEntries(Object.entries(choices).filter(([k]) => /^(flight|stay)-\d{1,2}$/.test(k))) } });
+        msg.textContent = `Sent to your advisor, reference ${request.id}. One price comes back, held for a stated time; nothing is charged until you say yes.`;
+        msg.classList.remove("hidden");
+        priceBtn.textContent = "With your advisor";
+        refreshCount();
+      } catch (err) { msg.textContent = err.message; msg.classList.remove("hidden"); priceBtn.disabled = false; priceBtn.textContent = "Send for a price"; }
+    });
+  }
+
+  /* ---------------------------------------------------------- trips --- */
+  $("#tripsBtn").addEventListener("click", () => openTrips());
+  const STATUS = { open: "With your advisor", working: "Being priced", quoted: "Price ready", paid: "Paid · booking", closed: "Complete", cancelled: "Cancelled" };
+
+  async function openTrips() {
+    const node = mount("#tripsTpl");
+    const due = node.querySelector("[data-due]"), reqs = node.querySelector("[data-reqs]"), trips = node.querySelector("[data-trips]");
+    const [d, r, t] = await Promise.all([api("/api/trips/due?window=week").catch(() => ({ nudges: [] })), api("/api/requests").catch(() => ({ requests: [] })), api("/api/trips").catch(() => ({ trips: [] }))]);
+    due.innerHTML = d.nudges.length ? d.nudges.slice(0, 12).map((n) => `<li><div class="l1"><span class="name">${esc(n.text.replace(/^(Today|Tomorrow|In \d+ days?|This week|Next week): /, ""))}</span><span class="pill">${n.inDays === 0 ? "Today" : n.inDays === 1 ? "Tomorrow" : n.inDays < 0 ? "Overdue" : "In " + n.inDays + " days"}</span></div><p class="l2">${esc(n.tripTitle)} · ${esc(n.date)}</p></li>`).join("") : `<li class="empty">Nothing this week. Reminders begin once a trip is booked.</li>`;
+    const live = r.requests.filter((x) => x.status !== "cancelled");
+    reqs.innerHTML = live.length ? live.map((x) => `<li data-id="${x.id}"><div class="l1"><span class="name">${esc(x.type === "booking" ? x.title : x.type === "call" ? "Call · " + x.slot : x.type === "enquiry" ? x.kind + " enquiry" : "WhatsApp handover")}</span><span class="pill ${x.status === "quoted" ? "hot" : ""}">${STATUS[x.status]}</span></div><p class="l2">${x.id} · ${when(x.updatedAt)} · ${esc(x.events.at(-1)?.text || "")}</p>${x.quote && x.status === "quoted" ? `<div class="quote"><span class="eyebrow" style="color:var(--rose)">All in, held until ${when(x.quote.holdUntil)}</span><b>${inr(x.quote.total)}</b>${x.quote.lines.map((l) => `<div style="font-size:13px;color:rgba(255,255,255,.7)">${esc(l.label)} · ${inr(l.amount)}</div>`).join("")}${x.quote.terms ? `<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:8px">${esc(x.quote.terms)}</div>` : ""}<div class="acts">${x.quote.paymentUrl && Date.parse(x.quote.holdUntil) > Date.now() ? `<a class="btn btn-sm" style="background:#fff;color:#111;border-color:#fff" href="${esc(x.quote.paymentUrl)}" target="_blank" rel="noopener noreferrer">Pay securely</a><button class="btn btn-sm" style="color:#fff;border-color:rgba(255,255,255,.5)" data-paid>I have paid</button>` : `<span style="font-size:12px;color:rgba(255,255,255,.7)">Your advisor will send the payment link.</span>`}</div></div>` : ""}</li>`).join("") : `<li class="empty">Nothing with your advisor yet. Open an itinerary and send it for a price.</li>`;
+    reqs.querySelectorAll("[data-paid]").forEach((b) => b.addEventListener("click", async () => {
+      const id = b.closest("[data-id]").dataset.id;
+      await api(`/api/requests/${id}/paid`, { method: "POST", body: {} }).catch(() => {});
+      b.replaceWith(Object.assign(document.createElement("span"), { textContent: "Thank you. Your advisor confirms here once it shows.", style: "font-size:12px;color:var(--rose)" }));
+    }));
+    trips.innerHTML = t.trips.length ? [...t.trips].reverse().map((x) => `<li><div class="l1"><button class="name" style="text-align:left;text-decoration:underline;text-underline-offset:4px" data-key="${x.key}">${esc(x.title)}</button><span class="pill">${esc(x.status)}</span></div><p class="l2">${x.start ? esc(x.start) + (x.end ? " to " + esc(x.end) : "") : "Dates to settle"}${x.places?.length ? " · " + esc(x.places.join(", ")) : ""}</p></li>`).join("") : `<li class="empty">No itineraries yet. Ask the desk for one.</li>`;
+    trips.querySelectorAll("[data-key]").forEach((b) => b.addEventListener("click", () => { node.remove(); openItinerary(b.dataset.key); }));
+  }
+
+  /* ---------------------------------------------------------- start --- */
+  const invite = new URLSearchParams(location.search).get("code");
+  if (session) openDesk();
+  else if (invite) { code.value = invite.toUpperCase().slice(0, 8); signIn(invite); }
+})();
+</script>
+</body>
+</html>
